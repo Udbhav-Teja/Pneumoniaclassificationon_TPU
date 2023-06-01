@@ -238,3 +238,27 @@ history = model.fit(
 
 
 
+fig, ax = plt.subplots(1, 4, figsize=(20, 3))
+ax = ax.ravel()
+
+for i, met in enumerate(["precision", "recall", "binary_accuracy", "loss"]):
+    ax[i].plot(history.history[met])
+    ax[i].plot(history.history["val_" + met])
+    ax[i].set_title("Model {}".format(met))
+    ax[i].set_xlabel("epochs")
+    ax[i].set_ylabel(met)
+    ax[i].legend(["train", "val"])
+    
+    
+    
+model.evaluate(test_ds, return_dict=True)
+
+for image, label in test_ds.take(1):
+    plt.imshow(image[0] / 255.0)
+    plt.title(CLASS_NAMES[label[0].numpy()])
+
+prediction = model.predict(test_ds.take(1))[0]
+scores = [1 - prediction, prediction]
+
+for score, name in zip(scores, CLASS_NAMES):
+    print("This image is %.2f percent %s" % ((100 * score), name))
